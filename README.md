@@ -47,7 +47,7 @@ Install required dependicies
 pip install -r requirements.txt
 ```
 
-## wget / cURL
+## wget
 Install unzip if not already installed.
 ```
 sudo apt-get install unzip
