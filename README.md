@@ -20,7 +20,7 @@ Fix for Oracle Cloud Infrastructure Out of Capacity error.
 # Installation
 ## One Command Install
 ```
-git clone https://github.com/mosesman831/OCI-OcC-Fix.git && cd OCI-OcX && pip install -r requirements.txt
+git clone https://github.com/mosesman831/OCI-OcC-Fix.git && cd OCI-OcC-Fix && pip install -r requirements.txt
 ```
 ## Using Git
 ### Step 1
