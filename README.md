@@ -54,7 +54,7 @@ sudo apt-get install unzip
 ```
 **wget**
 ```bash
-wget https://github.com/mosesman831/OCI-OcC-Fix/archive/refs/heads/main.zip && unzip main.zip && mv OCI-OcC-Fix-main OCI-OcC-Fix 
+wget https://github.com/mosesman831/OCI-OcC-Fix/archive/refs/heads/main.zip && unzip main.zip && mv OCI-OcC-Fix-main OCI-OcC-Fix && rm main.zip
 ```
 Install required dependicies
 ```bash
