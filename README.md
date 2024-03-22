@@ -17,6 +17,10 @@ Fix for Oracle Cloud Infrastructure Out of Capacity error.
 [Installation](#installation)
 [Configuration](#configuration)
 [How to use](#how-to-use)
+[In Use](#in-use)
+[Show your support❤️](#show-your-support)
+
+
 
 # Installation
 ## One Command Install
