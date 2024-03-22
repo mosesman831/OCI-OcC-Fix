@@ -1,4 +1,5 @@
-﻿# Oracle Cloud Infrastructure Out of Capacity Error
+
+# Oracle Cloud Infrastructure Out of Capacity Error
 
 Fix for Oracle Cloud Infrastructure Out of Capacity error.
 [![Oracle Cloud Infrastructure](https://img.shields.io/badge/Oracle%20Cloud%20Infrastructure-Out%20of%20Capacity%20Fix-blueviolet?labelColor=black&style=flat-square&link=https://github.com/mosesman831/OCI-OcC-Fix)](https://github.com/mosesman831/OCI-OcC-Fix)
@@ -22,6 +23,8 @@ Fix for Oracle Cloud Infrastructure Out of Capacity error.
 ```
 git clone https://github.com/mosesman831/OCI-OcC-Fix.git && cd OCI-OcC-Fix && pip install -r requirements.txt
 ```
+> Pro Tip
+> Use the One Command Install to setup quickly
 ## Using Git
 ### Step 1
 Run Git Clone.
@@ -111,7 +114,7 @@ Right click on it -> copy as curl (bash/cmd). Paste the clipboard contents in an
 Open bot.py in a a text editor.
 ### Step 9
 Find the variables and replace the `xxxx` fields respectively.
-```bot.py
+```py
 availabilityDomains = ["xxxx"]
 #e.g. availabilityDomains = ["KHsT:UK-MANCHESTER-1-AD-1","KHsT:UK-MANCHESTER-1-AD-2"]
 displayName = 'xxxx'
@@ -121,7 +124,7 @@ compartmentId = 'xxxx'
 subnetId = 'xxxx'
 #e.g. subnetId = 'ocid1.subnet.oc1.uk-manchester-1.aaaaaaa...'
 ssh_authorized_keys = "xxxx"
-#e.g. ssh_authorized_keys = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf... ssh-key-2024-03-15"
+#e.g. ssh_authorized_keys = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABKDNBgQDf... ssh-key-2024-03-15"
 boot_volume_size_in_gbs="xxxx"
 #Leave blank for default
 #e.g. boot_volume_size_in_gbs="47"
@@ -129,11 +132,11 @@ boot_volume_id="xxxx"
 #e.g. boot_volume_id="ocid1.bootvolume.oc1.uk-manchester-1.aaaaaaa..."
 ```
 # How to use?
-Run`bot.py` by double-clicking or running
-```
+Run `bot.py` by double-clicking or running
+```py
 python bot.py
 ``` 
-```
+```py
 python3 bot.py
 ```
 ## Run on SSH
@@ -141,8 +144,29 @@ python3 bot.py
 ```bash
 tmux new && python3 bot.py
 ```
-
+### Tmux
 Use `tmux` to  keep window running even after logout.
 ```bash
 tmux new
 ```
+
+# In Use
+
+## Success
+### Success Picture in Console
+Prerelease Prototype v0.1--prototype
+![Success Picture](https://github.com/mosesman831/OCI-OcC-Fix/blob/main/.github/images/success.png?raw=true)
+
+
+# Show your support ❤️
+### If you appreciate what I do please 
+
+### Star this project
+### or
+### Support me on Ko-fi!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R1VPIGM)
+
+#### Thanks for supporting!
+
+---
