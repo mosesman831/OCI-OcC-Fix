@@ -5,8 +5,8 @@
 #https://github.com/mosesman831/OCI-OcC-Fix
 #OCI OcC	
 #Out of Capacity Fix by @mosesman831
-#VERSION1.0
-version = "1.0"
+#VERSION1.1
+version = "1.1"
 
 imageId = 'xxxx'
 #e.g. imageId = 'ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaonnh....'
