@@ -5,10 +5,11 @@
 #https://github.com/mosesman831/OCI-OcC-Fix
 #OCI OcC	
 #Out of Capacity Fix by @mosesman831
-#VERSION1.0
-version = "1.0"
+#VERSION1.1
+version = "1.1"
 
-
+imageId = 'xxxx'
+#e.g. imageId = 'ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaonnh....'
 availabilityDomains = ["xxxx"]
 #e.g. availabilityDomains = ["KHsT:UK-MANCHESTER-1-AD-1","KHsT:UK-MANCHESTER-1-AD-2"]
 displayName = 'xxxx'
@@ -21,7 +22,7 @@ subnetId = 'xxxx'
 ssh_authorized_keys = "xxxx"
 #e.g. ssh_authorized_keys = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf... ssh-key-2024-03-15"
 boot_volume_size_in_gbs="xxxx"
-#Leave blank for default
+#"xxxx" = default
 #e.g. boot_volume_size_in_gbs="47"
 boot_volume_id="xxxx"
 #e.g. boot_volume_id="ocid1.bootvolume.oc1.uk-manchester-1.aaaaaaa..."
@@ -73,7 +74,7 @@ logging.info(f"Spawing {machine} instance {mname}")
 logging.info("Made by Moses")
 logging.info("https://github.com/mosesman831/OCI-OcC-Fix")
 logging.info(f"Version {version}")
-loggin.info("#####################################################")
+logging.info("#####################################################")
 
 
 message = f'Start spawning instance {mname} - {ocpus} ocpus - {memory_in_gbs} GB'
@@ -182,7 +183,7 @@ if bot_token!="xxxx" and uid!="xxxx":
 Email :- {email}
 Number of Retry :- {total_count}
 Bot Status :- Running
-Last Checked (UTC): {datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
+Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 Made by Moses
 https://github.com/mosesman831/OCI-OcC-Fix'''
 		msg_id = bot.send_message(uid, msg).id
@@ -228,7 +229,7 @@ https://github.com/mosesman831/OCI-OcC-Fix'''
 Email: {email}
 Number of Retry: {total_count}
 Bot Status: Running
-Last Checked (UTC): {datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
+Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 Made by Moses
 https://github.com/mosesman831/OCI-OcC-Fix'''
 						bot.edit_message_text(msg,uid,msg_id)
@@ -263,7 +264,7 @@ https://github.com/mosesman831/OCI-OcC-Fix'''
 Email: {email}
 Number of Retry: {total_count}
 Bot Status: Running
-Last Checked (UTC): {datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
+Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 Made by Moses
 https://github.com/mosesman831/OCI-OcC-Fix'''
 						bot.edit_message_text(msg,uid,msg_id)

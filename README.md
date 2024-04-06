@@ -91,12 +91,10 @@ Send `/newbot`
 ### Step 3
 Enter name and username
 ### Step 4
-Get Bot ID
+Message @Rose-Bot to get User ID ("uid")
 ### Step 5
-Message @Rose-Bot
-### Step 6
 Send `/id`
-### Step 7
+### Step 6
 Get userid
 
 ## Getting Oracle Cloud cURL
