@@ -176,6 +176,13 @@ Prerelease Prototype v0.1--prototype
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Unlifate"><img src="https://avatars.githubusercontent.com/u/4685835?v=4?s=100" width="100px;" alt="Peter Eisenschmidt"/><br /><sub><b>Peter Eisenschmidt</b></sub></a><br /><a href="#code-Unlifate" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
