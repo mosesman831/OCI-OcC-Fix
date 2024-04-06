@@ -1,4 +1,21 @@
 {
   "projectName": "OCI-OcC-Fix",
-  "projectOwner": "mosesman831"
+  "projectOwner": "mosesman831",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "Unlifate",
+      "name": "Peter Eisenschmidt",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4685835?v=4",
+      "profile": "https://github.com/Unlifate",
+      "contributions": [
+        "code"
+      ]
+    }
+  ]
 }
