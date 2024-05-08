@@ -133,33 +133,33 @@ total_ocpus = total_memory = _A1_Flex = 0
 instance_names = []
 
 if response:
-	logging.info(f"{len(response)} instance(s) found!")
-	for instance in response:
-		logging.info(f"{instance.display_name} - {instance.shape} - {int(instance.shape_config.ocpus)} ocpu(s) - {instance.shape_config.memory_in_gbs} GB(s) | State: {instance.lifecycle_state}")
-		instance_names.append(instance.display_name)
-		if instance.shape == "VM.Standard.A1.Flex" and instance.lifecycle_state not in ("TERMINATING", "TERMINATED"):
-			_A1_Flex += 1
-			total_ocpus += int(instance.shape_config.ocpus)
-			total_memory += int(instance.shape_config.memory_in_gbs)
-	message = f"Current: {_A1_Flex} active VM.Standard.A1.Flex instance(s) (including RUNNING OR STOPPED)"
-	logging.info(message)
+    logging.info(f"{len(response)} instance(s) found!")
+    for instance in response:
+        logging.info(f"{instance.display_name} - {instance.shape} - {int(instance.shape_config.ocpus)} ocpu(s) - {instance.shape_config.memory_in_gbs} GB(s) | State: {instance.lifecycle_state}")
+        instance_names.append(instance.display_name)
+        if instance.shape == machine and instance.lifecycle_state not in ("TERMINATING", "TERMINATED"):
+            _A1_Flex += 1
+            total_ocpus += int(instance.shape_config.ocpus)
+            total_memory += int(instance.shape_config.memory_in_gbs)
+    message = f"Current: {_A1_Flex} active {machine} instance(s) (including RUNNING OR STOPPED)"
+    logging.info(message)
 else:
-	logging.info(f"No instance(s) found!")
+    logging.info(f"No instance(s) found!")
 
-message = f"Total ocpus: {total_ocpus} - Total memory: {total_memory} (GB) || Free {4-total_ocpus} ocpus - Free memory: {24-total_memory} (GB)"
+message = f"Total ocpus: {total_ocpus} - Total memory: {total_memory} (GB) || Free {ocpus-total_ocpus} ocpus - Free memory: {memory_in_gbs-total_memory} (GB)"
 logging.info(message)
 
-if total_ocpus + ocpus > 4 or total_memory + memory_in_gbs > 24:
-    message = "Total maximum resource exceed free tier limit (Over 4 ocpus/24GB total). **SCRIPT STOPPED**"
+if total_ocpus + ocpus > ocpus or total_memory + memory_in_gbs > memory_in_gbs:
+    message = f"Total maximum resource exceeds free tier limit for {mname} (Over {ocpus} ocpus/{memory_in_gbs}GB total). **SCRIPT STOPPED**"
     logging.critical(message)
     sys.exit()
 
-if displayName in instance_names:
-    message = f"Duplicate display name: >>>{displayName}<<< Change this! **SCRIPT STOPPED**"
+if mname in instance_names:
+    message = f"Duplicate display name: >>>{mname}<<< Change this! **SCRIPT STOPPED**"
     logging.critical(message)
     sys.exit()
 
-message = f"Precheck pass! Create new instance VM.Standard.A1.Flex: {ocpus} opus - {memory_in_gbs} GB"
+message = f"Precheck pass! Create new instance {mname}: {ocpus} opus - {memory_in_gbs} GB"
 logging.info(message)
 
 wait_s_for_retry = 1
@@ -180,9 +180,9 @@ if boot_volume_id!="xxxx":
 if bot_token!="xxxx" and uid!="xxxx":
 	try:
 		msg = f'''Cloud Account Name :- {cloud_name}
-Email :- {email}
-Number of Retry :- {total_count}
-Bot Status :- Running
+Email:- {email}
+Number of Retry:- {total_count}
+Bot Status:- Running
 Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 Made by Moses
 https://github.com/mosesman831/OCI-OcC-Fix'''
@@ -207,9 +207,9 @@ while True:
 					try:
 						bot.delete_message(uid,msg_id)
 						msg=f'''"{displayName}" VPS is created successfully!
-Cloud Account Name :- {cloud_name}
+Cloud Account Name:- {cloud_name}
 Email :- {email}
-Number of Retry :- {total_count}
+Number of Retry:- {total_count}
 VPS IP :- {ip}
 Made by Moses
 https://github.com/mosesman831/OCI-OcC-Fix'''
