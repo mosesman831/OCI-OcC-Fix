@@ -42,7 +42,7 @@ Enter the folder.
 cd OCI-OcC-Fix
 ```
 ### Step 3
-Install requirements and dependicies
+Install requirements and dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 ## Using Releases
 Open [Releases](https://github.com/mosesman831/OCI-OcC-Fix/releases) and download latest
 
-Install required dependicies
+Install required dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -64,10 +64,32 @@ sudo apt-get install unzip
 ```bash
 wget https://github.com/mosesman831/OCI-OcC-Fix/archive/refs/heads/main.zip && unzip main.zip && mv OCI-OcC-Fix-main OCI-OcC-Fix && rm main.zip
 ```
-Install required dependicies
+Install required dependencies
 ```bash
 pip install -r requirements.txt
 ```
+
+## Docker
+### Step 1
+Build the Docker Container
+```bash
+sudo docker compose build
+```
+### Step 2
+Start Docker Containers
+```bash
+sudo docker compose up -d
+```
+
+### Step 3
+View Container Logs
+```bash
+sudo docker logs -f <cotainer>
+```
+
+## Run on 3rd Party containers
+Not yet added.
+
 
 # Configuration
 ## Getting Oracle Cloud API
@@ -100,21 +122,21 @@ Get userid
 
 ## Getting Oracle Cloud cURL
 ### Step 1
-Create an instance from from the OCI Console in the browser (Menu -> Compute -> Instances -> Create Instance)
+Create an instance from the OCI Console in the browser (Menu -> Compute -> Instances -> Create Instance)
 ### Step 2
 Change image and shape.
 ### Step 3
-Adjust Networking section, set "Do not assign a public IPv4 address" checkbox. If you don't have existing VNIC/subnet, please create VM.Standard.E2.1.Micro instance before doing everything.
+Adjust the Networking section, and set the "Do not assign a public IPv4 address" checkbox. If you don't have an existing VNIC/subnet, please create a VM.Standard.E2.1.Micro instance before doing everything.
 ### Step 4
-Download and save the public and private SSH key.
+Download and save the public and private SSH keys.
 ### Step 5
 Click `Ctrl + Shift + I` or `F12` to open browser's dev tools -> network tab
 ### Step 6
 Click Create and see if you get the **Out of capacity** error. Now find /instances API call (red).
 ### Step 7
-Right click on it -> copy as curl (bash/cmd). Paste the clipboard contents in any text editor.
+Right-click on it -> copy as curl (bash/cmd). Paste the clipboard contents in any text editor.
 ### Step 8
-Open bot.py in a a text editor.
+Open bot.py in a text editor.
 ### Step 9
 Find the variables and replace the `xxxx` fields respectively.
 ```py
@@ -162,7 +184,7 @@ Prerelease Prototype v0.1--prototype
 
 
 # Show your support ❤️
-### If you appreciate what I do please 
+### If you appreciate what I do, please 
 
 ### Star this project
 ### or
