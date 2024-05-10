@@ -181,6 +181,7 @@ Prerelease Prototype v0.1--prototype
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Unlifate"><img src="https://avatars.githubusercontent.com/u/4685835?v=4?s=100" width="100px;" alt="Peter Eisenschmidt"/><br /><sub><b>Peter Eisenschmidt</b></sub></a><br /><a href="#code-Unlifate" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/aldacco"><img src="https://avatars.githubusercontent.com/u/86637158?v=4?s=100" width="100px;" alt="aldacco"/><br /><sub><b>aldacco</b></sub></a><br /><a href="#code-aldacco" title="Code">💻</a> <a href="#doc-aldacco" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
