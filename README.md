@@ -179,7 +179,7 @@ tmux new
 
 ## Success
 ### Success Picture in Console
-Prerelease Prototype v0.1--prototype
+Prerelease Prototype
 ![Success Picture](https://github.com/mosesman831/OCI-OcC-Fix/blob/main/.github/images/success.png?raw=true)
 
 
