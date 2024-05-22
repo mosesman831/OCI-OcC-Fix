@@ -22,8 +22,8 @@ subnetId = 'xxxx'
 ssh_authorized_keys = "xxxx"
 #e.g. ssh_authorized_keys = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf... ssh-key-2024-03-15"
 boot_volume_size_in_gbs="xxxx"
-#"xxxx" = default
-#e.g. boot_volume_size_in_gbs="47"
+#"xxxx" = default, do not use quotes if specifying a number
+#e.g. boot_volume_size_in_gbs=47
 boot_volume_id="xxxx"
 #e.g. boot_volume_id="ocid1.bootvolume.oc1.uk-manchester-1.aaaaaaa..."
 
