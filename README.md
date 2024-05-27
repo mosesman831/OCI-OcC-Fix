@@ -28,7 +28,7 @@ Fix for Oracle Cloud Infrastructure Out of Capacity error.
 ```
 git clone https://github.com/mosesman831/OCI-OcC-Fix.git && cd OCI-OcC-Fix && pip install -r requirements.txt
 ```
-> Pro Tip
+> [!TIP]
 > Use the One Command Install to setup quickly
 ## Using Git
 ### Step 1
@@ -103,7 +103,7 @@ Find API keys, click "Add API Key" button
 Click "Download Private Key" and then "Add". Save the file as `oci_private_key.pem`
 ### Step 5
 Copy the contents from the Text Box and save it to file `config`.
-> Pro Tip
+> [!TIP]
 > You could use `nano` to edit the files easier.
 
 ## Getting Telegram Bot ID
