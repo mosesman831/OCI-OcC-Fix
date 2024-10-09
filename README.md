@@ -1,9 +1,12 @@
 
-# Oracle Cloud Infrastructure Out of Capacity Error
+# OCI OcC v2.1.0-BETA
+> [!TIP]
+> This is currently in beta, you might experience bugs.
+> Please report any issues in ISSUES.
 
 Fix for Oracle Cloud Infrastructure Out of Capacity error.
 [![Oracle Cloud Infrastructure](https://img.shields.io/badge/Oracle%20Cloud%20Infrastructure-Out%20of%20Capacity%20Fix-blueviolet?labelColor=black&style=flat-square&link=https://github.com/mosesman831/OCI-OcC-Fix)](https://github.com/mosesman831/OCI-OcC-Fix)
-[![Currently](https://img.shields.io/badge/Currently-Working-blueviolet?labelColor=black&style=flat-square&link=https://github.com/mosesman831/OCI-OcC-Fix)](https://github.com/mosesman831/OCI-OcC-Fix)
+[![Version](https://img.shields.io/badge/Version-2.1.0BETA-blueviolet?labelColor=black&style=flat-square&link=https://github.com/mosesman831/OCI-OcC-Fix)](https://github.com/mosesman831/OCI-OcC-Fix)
 [![GitHub release](https://img.shields.io/github/release/mosesman831/OCI-OcC-Fix?include_prereleases=&sort=semver&color=blueviolet&style=flat-square)](https://github.com/mosesman831/OCI-OcC-Fix/releases/)
 [![dependency - Python](https://img.shields.io/badge/dependency-Python-blueviolet?style=flat-square)](https://github.com/mosesman831/OCI-OcC-Fix/releases/)
 
@@ -130,31 +133,25 @@ Adjust the Networking section, and set the "Do not assign a public IPv4 address"
 ### Step 4
 Download and save the public and private SSH keys.
 ### Step 5
-Click `Ctrl + Shift + I` or `F12` to open browser's dev tools -> network tab
+Click Ctrl + Shift + I or F12 to open browser's dev tools -> network tab
 ### Step 6
-Click Create and see if you get the **Out of capacity** error. Now find /instances API call (red).
+Click Create and see if you get the Out of capacity error. Now find /instances API call (red).
 ### Step 7
 Right-click on it -> copy as curl (bash/cmd). Paste the clipboard contents in any text editor.
 ### Step 8
-Open bot.py in a text editor.
-### Step 9
-Find the variables and replace the `xxxx` fields respectively.
-```py
-availabilityDomains = ["xxxx"]
-#e.g. availabilityDomains = ["KHsT:UK-MANCHESTER-1-AD-1","KHsT:UK-MANCHESTER-1-AD-2"]
-displayName = 'xxxx'
-#e.g. displayName = 'VPS1'
-compartmentId = 'xxxx'
-#e.g. compartmentId = 'ocid1.tenancy.oc1..aaaaaaaa...'
-subnetId = 'xxxx'
-#e.g. subnetId = 'ocid1.subnet.oc1.uk-manchester-1.aaaaaaa...'
-ssh_authorized_keys = "xxxx"
-#e.g. ssh_authorized_keys = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABKDNBgQDf... ssh-key-2024-03-15"
-boot_volume_size_in_gbs="xxxx"
-#Leave blank for default
-#e.g. boot_volume_size_in_gbs="47"
-boot_volume_id="xxxx"
-#e.g. boot_volume_id="ocid1.bootvolume.oc1.uk-manchester-1.aaaaaaa..."
+Create a `.env` file in the same directory as your script and add the following environment variables:
+```
+OCI_IMAGE_ID=your_image_id
+OCI_AVAILABILITY_DOMAINS=your_availability_domains
+OCI_DISPLAY_NAME=your_display_name
+OCI_COMPARTMENT_ID=your_compartment_id
+OCI_SUBNET_ID=your_subnet_id
+OCI_SSH_AUTHORIZED_KEYS=your_ssh_keys
+OCI_BOOT_VOLUME_SIZE_IN_GBS=your_volume_size
+OCI_BOOT_VOLUME_ID=your_volume_id
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_UID=your_uid
+MACHINE_TYPE=ARM
 ```
 # How to use?
 Run `bot.py` by double-clicking or running
