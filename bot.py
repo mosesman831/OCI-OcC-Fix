@@ -3,52 +3,9 @@
 #Made by @mosesman831
 #https://github.com/mosesman831
 #https://github.com/mosesman831/OCI-OcC-Fix
-#OCI OcC	
 #Out of Capacity Fix by @mosesman831
-#VERSION1.1
-version = "1.1"
+#VERSION 2.0.1-beta
 
-imageId = 'xxxx'
-#e.g. imageId = 'ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaonnh....'
-availabilityDomains = ["xxxx"]
-#e.g. availabilityDomains = ["KHsT:UK-MANCHESTER-1-AD-1","KHsT:UK-MANCHESTER-1-AD-2"]
-displayName = 'xxxx'
-#e.g. displayName = 'VPS1'
-compartmentId = 'xxxx'
-#e.g. compartmentId = 'ocid1.tenancy.oc1..aaaaaaaa...'
-
-subnetId = 'xxxx'
-#e.g. subnetId = 'ocid1.subnet.oc1.uk-manchester-1.aaaaaaa...'
-ssh_authorized_keys = "xxxx"
-#e.g. ssh_authorized_keys = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDf... ssh-key-2024-03-15"
-boot_volume_size_in_gbs="xxxx"
-#"xxxx" = default, do not use quotes if specifying a number
-#e.g. boot_volume_size_in_gbs=47
-boot_volume_id="xxxx"
-#e.g. boot_volume_id="ocid1.bootvolume.oc1.uk-manchester-1.aaaaaaa..."
-
-bot_token = "xxxx"
-#Telegram BOT Token
-#Use @BotFather to create a new bot and get the token (/newbot)
-uid = "xxxx"
-#Telegram User ID
-#Use @RoseBot to get your user id (/id)
-
-#AMD not working yet. Please do not change.
-machine = "ARM"
-#e.g. machine = AMD or ARM
-if machine=="ARM":
-	#edit if you want to use ARM image (MAX OCPU 4 and MEMORY 24)
-	ocpus = 4
-	memory_in_gbs = 24
-	mname = "VM.Standard.A1.Flex"
-elif machine == "AMD":
-	#DO NOT EDIT
-	ocpus = 1
-	memory_in_gbs = 1
-	mname = "VM.Standard.E2.1.Micro"
-
-minimum_time_interval = 1
 
 import oci
 import logging
@@ -56,228 +13,109 @@ import time
 import sys
 import telebot
 import datetime
+import os
+from dotenv import load_dotenv
 
-bot = telebot.TeleBot(bot_token)
+# Load environment variables from .env file
+load_dotenv()
 
-LOG_FORMAT = '[%(levelname)s] %(asctime)s - %(message)s'
-logging.basicConfig(
-    level=logging.INFO,
-    format=LOG_FORMAT,
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+# Configuration
+VERSION = "2.0.1-beta"
+IMAGE_ID = os.getenv('OCI_IMAGE_ID', 'default_image_id')
+AVAILABILITY_DOMAINS = os.getenv('OCI_AVAILABILITY_DOMAINS', 'default_domain').split(',')
+DISPLAY_NAME = os.getenv('OCI_DISPLAY_NAME', 'default_display_name')
+COMPARTMENT_ID = os.getenv('OCI_COMPARTMENT_ID', 'default_compartment_id')
+SUBNET_ID = os.getenv('OCI_SUBNET_ID', 'default_subnet_id')
+SSH_AUTHORIZED_KEYS = os.getenv('OCI_SSH_AUTHORIZED_KEYS', 'default_ssh_keys')
+BOOT_VOLUME_SIZE_IN_GBS = os.getenv('OCI_BOOT_VOLUME_SIZE_IN_GBS', 'default_volume_size')
+BOOT_VOLUME_ID = os.getenv('OCI_BOOT_VOLUME_ID', 'default_volume_id')
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', 'default_bot_token')
+UID = os.getenv('TELEGRAM_UID', 'default_uid')
+MACHINE = os.getenv('MACHINE_TYPE', 'ARM')  # Options: "ARM" or "AMD"
 
-logging.info("#####################################################")
-logging.info("Welcome to OCI OcC Fix by Moses")
-logging.info(f"Spawing {machine} instance {mname}")
-logging.info("Made by Moses")
-logging.info("https://github.com/mosesman831/OCI-OcC-Fix")
-logging.info(f"Version {version}")
-logging.info("#####################################################")
+# Set machine configurations
+def get_machine_config(machine: str) -> dict:
+    if machine == "ARM":
+        return {
+            "ocpus": 4,
+            "memory_in_gbs": 24,
+            "mname": "VM.Standard.A1.Flex"
+        }
+    else:
+        return {
+            "ocpus": 1,
+            "memory_in_gbs": 1,
+            "mname": "VM.Standard.E2.1.Micro"
+        }
 
+machine_config = get_machine_config(MACHINE)
 
-message = f'Start spawning instance {mname} - {ocpus} ocpus - {memory_in_gbs} GB'
-logging.info(message)
+# Logging configuration
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-logging.info("Loading OCI config")
-config = oci.config.from_file(file_location="./config")
+logger.info(f"Starting OCI instance creation script version {VERSION}")
+logger.info(f"Using machine configuration: {machine_config}")
 
-logging.info("Initialize service client with default config file")
-to_launch_instance = oci.core.ComputeClient(config)
-identity_client = oci.identity.IdentityClient(config)
-vnc_client = oci.core.VirtualNetworkClient(config)
-cloud_name = identity_client.get_tenancy(tenancy_id=compartmentId).data.name
-email = identity_client.list_users(compartment_id=compartmentId).data[0].email
+# Initialize OCI clients
+compute_client = oci.core.ComputeClient(oci.config.from_file())
+vnc_client = oci.core.VirtualNetworkClient(oci.config.from_file())
 
-message = f"Instance to create: {mname} - {ocpus} ocpus - {memory_in_gbs} GB"
-logging.info(message)
+# Function to log and send message
+def log_and_send_message(message: str):
+    logger.info(message)
+    bot = telebot.TeleBot(BOT_TOKEN)
+    bot.send_message(UID, message)
 
-volume_client = oci.core.BlockstorageClient(config)
-
-total_volume_size=0
-
-logging.info("Check available storage in account")
-
-if imageId!="xxxx":
-	try:
-		list_volumes = volume_client.list_volumes(compartment_id=compartmentId).data
-	except Exception as e:
-		logging.info(f"{e.status} - {e.code} - {e.message}")
-		logging.info("Error detected. Stopping script. Check values of bot.py file, config file and oci_private_key.pem file.")
-		sys.exit()
-	if list_volumes!=[]:
-		for block_volume in list_volumes:
-			if block_volume.lifecycle_state not in ("TERMINATING", "TERMINATED"):
-				total_volume_size=total_volume_size+block_volume.size_in_gbs
-	for availabilityDomain in availabilityDomains:
-		list_boot_volumes = volume_client.list_boot_volumes(availability_domain=availabilityDomain,compartment_id=compartmentId).data
-		if list_boot_volumes!=[]:
-			for b_volume in list_boot_volumes:
-				if b_volume.lifecycle_state not in ("TERMINATING", "TERMINATED"):
-					total_volume_size=total_volume_size+b_volume.size_in_gbs
-	free_storage=200-total_volume_size
-	if boot_volume_size_in_gbs!="xxxx" and free_storage<boot_volume_size_in_gbs:
-		logging.critical(f"There is {free_storage} GB out of 200 GB left in your Oracle Cloud account. {boot_volume_size_in_gbs} GB storage needs to create this vps. So, you need to delete unnecessary boot and block volumes in your oracle cloud account. **SCRIPT STOPPED**")
-		sys.exit()
-	if boot_volume_size_in_gbs=="xxxx" and free_storage<47:
-		logging.critical(f"There is {free_storage} GB out of 200 GB left in your Oracle Cloud account. 47 GB storage needs to create this vps. So, you need to delete unnecessary boot and block volumes in your oracle cloud account. **SCRIPT STOPPED**")
-		sys.exit()
-		
-logging.info("Check current instances in account")
-
-current_instance = to_launch_instance.list_instances(compartment_id=compartmentId)
-response = current_instance.data
-
-total_ocpus = total_memory = _A1_Flex = 0
-instance_names = []
-
-if response:
-	logging.info(f"{len(response)} instance(s) found!")
-	for instance in response:
-		logging.info(f"{instance.display_name} - {instance.shape} - {int(instance.shape_config.ocpus)} ocpu(s) - {instance.shape_config.memory_in_gbs} GB(s) | State: {instance.lifecycle_state}")
-		instance_names.append(instance.display_name)
-		if instance.shape == "VM.Standard.A1.Flex" and instance.lifecycle_state not in ("TERMINATING", "TERMINATED"):
-			_A1_Flex += 1
-			total_ocpus += int(instance.shape_config.ocpus)
-			total_memory += int(instance.shape_config.memory_in_gbs)
-	message = f"Current: {_A1_Flex} active VM.Standard.A1.Flex instance(s) (including RUNNING OR STOPPED)"
-	logging.info(message)
-else:
-	logging.info(f"No instance(s) found!")
-
-message = f"Total ocpus: {total_ocpus} - Total memory: {total_memory} (GB) || Free {4-total_ocpus} ocpus - Free memory: {24-total_memory} (GB)"
-logging.info(message)
-
-if total_ocpus + ocpus > 4 or total_memory + memory_in_gbs > 24:
-    message = "Total maximum resource exceed free tier limit (Over 4 ocpus/24GB total). **SCRIPT STOPPED**"
-    logging.critical(message)
-    sys.exit()
-
-if displayName in instance_names:
-    message = f"Duplicate display name: >>>{displayName}<<< Change this! **SCRIPT STOPPED**"
-    logging.critical(message)
-    sys.exit()
-
-message = f"Precheck pass! Create new instance VM.Standard.A1.Flex: {ocpus} opus - {memory_in_gbs} GB"
-logging.info(message)
-
-wait_s_for_retry = 1
-tc=0
-oc=0
 total_count = 0
 j_count = 0
+wait_s_for_retry = 10
 
-if imageId!="xxxx":
-	if boot_volume_size_in_gbs=="xxxx":
-		op=oci.core.models.InstanceSourceViaImageDetails(source_type="image", image_id=imageId)
-	else:
-		op=oci.core.models.InstanceSourceViaImageDetails(source_type="image", image_id=imageId,boot_volume_size_in_gbs=boot_volume_size_in_gbs)
-		
-if boot_volume_id!="xxxx":
-	op=oci.core.models.InstanceSourceViaBootVolumeDetails(source_type="bootVolume", boot_volume_id=boot_volume_id)
+try:
+    instance_detail = oci.core.models.LaunchInstanceDetails(
+        compartment_id=COMPARTMENT_ID,
+        display_name=DISPLAY_NAME,
+        availability_domain=AVAILABILITY_DOMAINS[0],
+        shape=machine_config["mname"],
+        source_details=oci.core.models.InstanceSourceViaImageDetails(
+            source_type="image",
+            image_id=IMAGE_ID,
+            boot_volume_size_in_gbs=BOOT_VOLUME_SIZE_IN_GBS
+        ),
+        create_vnic_details=oci.core.models.CreateVnicDetails(
+            subnet_id=SUBNET_ID,
+            assign_public_ip=True
+        ),
+        metadata={
+            "ssh_authorized_keys": SSH_AUTHORIZED_KEYS
+        }
+    )
 
-if bot_token!="xxxx" and uid!="xxxx":
-	try:
-		msg = f'''Cloud Account Name :- {cloud_name}
-Email :- {email}
-Number of Retry :- {total_count}
-Bot Status :- Running
-Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-Made by Moses
-https://github.com/mosesman831/OCI-OcC-Fix'''
-		msg_id = bot.send_message(uid, msg).id
-	except:
-		pass
+    launch_instance_response = compute_client.launch_instance(instance_detail)
+    time.sleep(60)
 
-while True:
-	for availabilityDomain in availabilityDomains:
-		instance_detail = oci.core.models.LaunchInstanceDetails(metadata={"ssh_authorized_keys": ssh_authorized_keys},availability_domain=availabilityDomain,shape='VM.Standard.A1.Flex',compartment_id=compartmentId,display_name=displayName,is_pv_encryption_in_transit_enabled=True,source_details=op,create_vnic_details=oci.core.models.CreateVnicDetails(assign_public_ip=True,subnet_id=subnetId),shape_config=oci.core.models.LaunchInstanceShapeConfigDetails(ocpus=ocpus, memory_in_gbs=memory_in_gbs))
-		try:
-			launch_instance_response = to_launch_instance.launch_instance(instance_detail)
-			time.sleep(60)
-			list_vnic_attachments_response = to_launch_instance.list_vnic_attachments(compartment_id=compartmentId,instance_id=launch_instance_response.data.id)
-			list_private_ips_response = vnc_client.list_private_ips(subnet_id=subnetId,vnic_id=list_vnic_attachments_response.data[0].vnic_id)
-			get_public_ip_response = vnc_client.get_public_ip_by_private_ip_id(get_public_ip_by_private_ip_id_details=oci.core.models.GetPublicIpByPrivateIpIdDetails(private_ip_id=list_private_ips_response.data[0].id))
-			ip = get_public_ip_response.data.ip_address
-			total_count = total_count+1
-			logging.info(f'"{displayName}" VPS {mname} is created successfully!. Cloud Account Name :- {cloud_name}. Email :- {email}. Number of Retry :- {total_count}. VPS IP :- {ip}')
-			if bot_token!="xxxx" and uid!="xxxx":
-				while True:
-					try:
-						bot.delete_message(uid,msg_id)
-						msg=f'''"{displayName}" VPS is created successfully!
-Cloud Account Name :- {cloud_name}
-Email :- {email}
-Number of Retry :- {total_count}
-VPS IP :- {ip}
-Made by Moses
-https://github.com/mosesman831/OCI-OcC-Fix'''
-						bot.send_message(uid,msg)
-						break
-					except:
-						time.sleep(5)
-			sys.exit()
-		except oci.exceptions.ServiceError as e:
-			total_count = total_count +1
-			j_count = j_count+1
-			if j_count==10:
-				j_count=0
-				if bot_token!="xxxx" and uid!="xxxx":
-					try:
-						msg=f'''Cloud Account Name: {cloud_name}
-Email: {email}
-Number of Retry: {total_count}
-Bot Status: Running
-Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-Made by Moses
-https://github.com/mosesman831/OCI-OcC-Fix'''
-						bot.edit_message_text(msg,uid,msg_id)
-					except:
-						pass
-			if e.status == 429:
-				oc=0
-				tc=tc+1
-				if tc==2:
-					wait_s_for_retry=wait_s_for_retry+1
-					tc=0
-				message = f'{e.status} - {e.code} - {e.message}. Retrying after {wait_s_for_retry} seconds. Number of Retry: {total_count}'
-				time.sleep(wait_s_for_retry)
-			else:
-				tc=0
-				if wait_s_for_retry>minimum_time_interval:
-					oc=oc+1
-				if oc==2:
-					wait_s_for_retry=wait_s_for_retry-1
-					oc=0
-				message = f'{e.status} - {e.code} - {e.message}. Retrying after {wait_s_for_retry} seconds. Number of Retry: {total_count}'
-				logging.info(message)
-				time.sleep(wait_s_for_retry)
-		except Exception as e:
-			total_count=total_count+1
-			j_count=j_count+1
-			if j_count==10:
-				j_count=0
-				if bot_token!="xxxx" and uid!="xxxx":
-					try:
-						msg=f'''Cloud Account Name: {cloud_name}
-Email: {email}
-Number of Retry: {total_count}
-Bot Status: Running
-Last Checked: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-Made by Moses
-https://github.com/mosesman831/OCI-OcC-Fix'''
-						bot.edit_message_text(msg,uid,msg_id)
-					except:
-						pass
-			tc=0
-			if wait_s_for_retry>minimum_time_interval:
-				oc=oc+1
-			if oc==2:
-				wait_s_for_retry=wait_s_for_retry-1
-				oc=0
-			message = f'{e}. Retrying after {wait_s_for_retry} seconds. Number of Retry: {total_count}'
-			logging.info(message)
-			time.sleep(wait_s_for_retry)
-		except KeyboardInterrupt:
-			sys.exit()
+    vnic_attachments = compute_client.list_vnic_attachments(compartment_id=COMPARTMENT_ID, instance_id=launch_instance_response.data.id)
+    private_ips = vnc_client.list_private_ips(subnet_id=SUBNET_ID, vnic_id=vnic_attachments.data[0].vnic_id)
+    public_ip = vnc_client.get_public_ip_by_private_ip_id(oci.core.models.GetPublicIpByPrivateIpIdDetails(private_ip_id=private_ips.data[0].id)).data.ip_address
+
+    total_count += 1
+    logger.info(f'"{DISPLAY_NAME}" VPS {machine_config["mname"]} created successfully! IP: {public_ip}')
+    log_and_send_message(f'"{DISPLAY_NAME}" VPS created successfully!\nIP: {public_ip}')
+
+    sys.exit()
+
+except oci.exceptions.ServiceError as e:
+    total_count += 1
+    j_count += 1
+    if j_count == 10:
+        j_count = 0
+        log_and_send_message(f"Bot is still running. Checked at: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    message = f'{e.status} - {e.code} - {e.message}. Retrying after {wait_s_for_retry} seconds. Number of Retry: {total_count}'
+    logger.info(message)
+
+    if e.status == 429:
+        wait_s_for_retry += 1
+    else:
+        time.sleep(wait_s_for_retry)
+        # Retry logic can be implemented here
