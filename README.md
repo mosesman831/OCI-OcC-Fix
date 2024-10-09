@@ -51,7 +51,7 @@ pip install -r requirements.txt
 ```
 
 ## Using Releases
-Open [Releases](https://github.com/mosesman831/OCI-OcC-Fix/releases) and download latest
+Open [Releases](https://github.com/mosesman831/OCI-OcC-Fix/releases) and download V2 Beta
 
 Install required dependencies
 ```bash
