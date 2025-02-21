@@ -5,7 +5,7 @@ Automated solution for Oracle Cloud Infrastructure (OCI) Out of Capacity errors 
 [![OCI Status](https://img.shields.io/badge/OCI-Compatible-blueviolet?labelColor=black&style=flat-square)](https://cloud.oracle.com)
 [![Python Version](https://img.shields.io/badge/Python-3.8%2B-blueviolet?style=flat-square)](https://python.org)
 [![GitHub release](https://img.shields.io/github/release/mosesman831/OCI-OcC-Fix?color=blueviolet&style=flat-square)](https://github.com/mosesman831/OCI-OcC-Fix/releases/)
-[![License](https://img.shields.io/badge/License-GNU-blueviolet?style=flat-square)](LICENSE)
+![GitHub License](https://img.shields.io/github/license/mosesman831/OCI-OcC-Fix)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R1VPIGM)
 
