@@ -107,7 +107,7 @@ class OciOccFix:
             self.config.get('OCI', 'compartment_id')
         ).data
         
-        message = f"""OCI Capacity Manager Started
+        message = f"""OCI-OcC-Fix (github/mosesman831/OCI-OcC-Fix)
 Account: {tenancy.name}
 User: {users[0].email if users else 'Unknown'}
 Time: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
