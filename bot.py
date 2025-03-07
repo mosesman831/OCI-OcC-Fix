@@ -1,6 +1,6 @@
 """
 OCI Out of Capacity Fix
-Version 2.1.3
+Version 2.1.4
 Moses (@mosesman831)
 GitHub: https://github.com/mosesman831/OCI-OcC-Fix
 """
@@ -136,10 +136,10 @@ class OciOccFix:
         """Send startup message with enhanced error handling"""
         try:
             tenancy = self.clients['identity'].get_tenancy(
-                self.config.get('OCI', 'compartment_id')
+                compartment_id=self.config.get('OCI', 'compartment_id')
             ).data
             users = self.clients['identity'].list_users(
-                self.config.get('OCI', 'compartment_id')
+                compartment_id=self.config.get('OCI', 'compartment_id')
             ).data
             
             message = (
@@ -151,7 +151,10 @@ class OciOccFix:
                 f"• Machine: {self.config.get('Machine', 'shape')}"
             )
             
-            sent = bot.send_message(self.config.get('Telegram', 'uid'), message)
+            sent = bot.send_message(
+                chat_id=self.config.get('Telegram', 'uid'),
+                text=message
+            )
             self.tg_message_id = sent.message_id
         except Exception as e:
             logging.error(f"Telegram startup message failed: {str(e)}")
@@ -162,15 +165,18 @@ class OciOccFix:
             compartment_id = self.config.get('OCI', 'compartment_id')
             total_storage = 0
 
-            # Storage validation
-            volumes = self.clients['blockstorage'].list_volumes(compartment_id).data
+            # Storage validation (updated for SDK 2.147.0)
+            volumes = self.clients['blockstorage'].list_volumes(
+                compartment_id=compartment_id
+            ).data
+            
             total_storage += sum(
                 v.size_in_gbs 
                 for v in volumes 
                 if v.lifecycle_state not in ("TERMINATING", "TERMINATED")
             )
 
-            # Boot volumes check
+            # Boot volumes check (updated for SDK 2.147.0)
             ads = json.loads(self.config.get('OCI', 'availability_domains'))
             for ad in ads:
                 boot_volumes = self.clients['blockstorage'].list_boot_volumes(
@@ -194,8 +200,10 @@ class OciOccFix:
                 )
                 return False
 
-            # Instance validation
-            instances = self.clients['compute'].list_instances(compartment_id).data
+            # Instance validation (updated for SDK 2.147.0)
+            instances = self.clients['compute'].list_instances(
+                compartment_id=compartment_id
+            ).data
             active_instances = [
                 i for i in instances 
                 if i.lifecycle_state not in ("TERMINATING", "TERMINATED")
@@ -249,7 +257,9 @@ class OciOccFix:
                 )
             )
 
-            response = self.clients['compute'].launch_instance(launch_details)
+            response = self.clients['compute'].launch_instance(
+                launch_instance_details=launch_details
+            )
             return response.data.id
         except oci.exceptions.ServiceError as e:
             logging.warning(
@@ -291,7 +301,7 @@ class OciOccFix:
             ).data[0].id
 
             public_ip = self.clients['network'].get_public_ip_by_private_ip_id(
-                oci.core.models.GetPublicIpByPrivateIpIdDetails(
+                get_public_ip_by_private_ip_id_details=oci.core.models.GetPublicIpByPrivateIpIdDetails(
                     private_ip_id=private_ip
                 )
             ).data.ip_address
