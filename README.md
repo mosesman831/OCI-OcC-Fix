@@ -75,7 +75,7 @@ Change image and shape.
 #### Step 3
 Adjust the Networking section, and set the "Do not assign a public IPv4 address" checkbox. If you don't have an existing VNIC/subnet, please create a VM.Standard.E2.1.Micro instance before doing anything.
 #### Step 4
-Download and save the public and private SSH keys.
+In the SSH Keys section, choose **"Generate a key pair for me"** or upload your own public key. OCI downloads the private key file during instance creation, and that is the file you use to connect to the instance later.
 #### Step 5
 Click `Ctrl + Shift + I` or `F12` to open browser's dev tools -> network tab
 #### Step 6
