@@ -1,6 +1,6 @@
 """
 OCI Out of Capacity Fix
-Version 2.1.4
+Version 2.1.3
 Moses (@mosesman831)
 GitHub: https://github.com/mosesman831/OCI-OcC-Fix
 """
@@ -40,7 +40,6 @@ class OciOccFix:
         self.clients = self.initialize_oci_clients()
         
         # Phase 4: Telegram integration
-        # Fixed execution order
         self.tg_message_id = None
         self.tg_bot = self.initialize_telegram()
         
@@ -104,12 +103,12 @@ class OciOccFix:
     def initialize_oci_clients(self) -> Dict[str, object]:
         """Initialize OCI clients with error containment"""
         try:
-            oci_config = oci.config.from_file('./config')
+            self.oci_config = oci.config.from_file('./config')
             return {
-                'compute': oci.core.ComputeClient(oci_config),
-                'identity': oci.identity.IdentityClient(oci_config),
-                'network': oci.core.VirtualNetworkClient(oci_config),
-                'blockstorage': oci.core.BlockstorageClient(oci_config)
+                'compute': oci.core.ComputeClient(self.oci_config),
+                'identity': oci.identity.IdentityClient(self.oci_config),
+                'network': oci.core.VirtualNetworkClient(self.oci_config),
+                'blockstorage': oci.core.BlockstorageClient(self.oci_config)
             }
         except Exception as e:
             logging.error(f"OCI client initialization failed: {str(e)}")
@@ -137,10 +136,10 @@ class OciOccFix:
         """Send startup message with enhanced error handling"""
         try:
             tenancy = self.clients['identity'].get_tenancy(
-                self.config.get('OCI', 'compartment_id')
+                self.oci_config['tenancy']
             ).data
             users = self.clients['identity'].list_users(
-                self.config.get('OCI', 'compartment_id')
+                compartment_id=self.oci_config['tenancy']
             ).data
             
             message = (
@@ -152,10 +151,7 @@ class OciOccFix:
                 f"• Machine: {self.config.get('Machine', 'shape')}"
             )
             
-            sent = bot.send_message(
-                chat_id=self.config.get('Telegram', 'uid'),
-                text=message
-            )
+            sent = bot.send_message(self.config.get('Telegram', 'uid'), message)
             self.tg_message_id = sent.message_id
         except Exception as e:
             logging.error(f"Telegram startup message failed: {str(e)}")
@@ -166,18 +162,15 @@ class OciOccFix:
             compartment_id = self.config.get('OCI', 'compartment_id')
             total_storage = 0
 
-            # Storage validation (updated for SDK 2.147.0)
-            volumes = self.clients['blockstorage'].list_volumes(
-                compartment_id=compartment_id
-            ).data
-            
+            # Storage validation
+            volumes = self.clients['blockstorage'].list_volumes(compartment_id=compartment_id).data
             total_storage += sum(
                 v.size_in_gbs 
                 for v in volumes 
                 if v.lifecycle_state not in ("TERMINATING", "TERMINATED")
             )
 
-            # Boot volumes check (updated for SDK 2.147.0)
+            # Boot volumes check
             ads = json.loads(self.config.get('OCI', 'availability_domains'))
             for ad in ads:
                 boot_volumes = self.clients['blockstorage'].list_boot_volumes(
@@ -201,10 +194,8 @@ class OciOccFix:
                 )
                 return False
 
-            # Instance validation (updated for SDK 2.147.0)
-            instances = self.clients['compute'].list_instances(
-                compartment_id=compartment_id
-            ).data
+            # Instance validation
+            instances = self.clients['compute'].list_instances(compartment_id=compartment_id).data
             active_instances = [
                 i for i in instances 
                 if i.lifecycle_state not in ("TERMINATING", "TERMINATED")
@@ -258,9 +249,7 @@ class OciOccFix:
                 )
             )
 
-            response = self.clients['compute'].launch_instance(
-                launch_instance_details=launch_details
-            )
+            response = self.clients['compute'].launch_instance(launch_details)
             return response.data.id
         except oci.exceptions.ServiceError as e:
             logging.warning(
@@ -302,7 +291,7 @@ class OciOccFix:
             ).data[0].id
 
             public_ip = self.clients['network'].get_public_ip_by_private_ip_id(
-                get_public_ip_by_private_ip_id_details=oci.core.models.GetPublicIpByPrivateIpIdDetails(
+                oci.core.models.GetPublicIpByPrivateIpIdDetails(
                     private_ip_id=private_ip
                 )
             ).data.ip_address
