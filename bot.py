@@ -40,8 +40,8 @@ class OciOccFix:
         self.clients = self.initialize_oci_clients()
         
         # Phase 4: Telegram integration
-        self.tg_bot = self.initialize_telegram()
         self.tg_message_id = None
+        self.tg_bot = self.initialize_telegram()
         
         # Phase 5: Runtime state
         self.total_retries = 0
