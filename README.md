@@ -12,6 +12,10 @@ Automated solution for Oracle Cloud Infrastructure (OCI) Out of Capacity errors 
 > **Maintained by [Moses](https://github.com/mosesman831)**  
 > **Special thanks to all [contributors](#contributors)**
 
+> [!TIP]
+> It is *HIGHLY* recommended you upgrade to PAYG plan if possible - they allow you to instantly create a VPS.
+> Nothing will be charged if you don't go over the free tier limits.
+
 ## Features ✨
 - 🚀 Multi-Availability Domain rotation
 - 📊 Resource quota validation
