@@ -224,3 +224,4 @@ docker compose down
 
 **License**: GNU |  **Maintainer**:  [Moses](https://github.com/mosesman831)  
 **Report Issues**:  [GitHub Issues](https://github.com/mosesman831/OCI-OcC-Fix/issues)
+> This project is **AI‑driven** in its development and maintenance, using AI agents for code generation, refactoring, and PR reviews, with human design and final approval.
