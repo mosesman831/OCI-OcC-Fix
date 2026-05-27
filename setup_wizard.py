@@ -137,6 +137,7 @@ def _write_updates(path: Path, updates: Dict[str, Dict[str, str]], default_separ
     lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
     for section, values in updates.items():
         lines = _update_ini_lines(lines, section, values, default_separator=default_separator)
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
