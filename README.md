@@ -163,7 +163,7 @@ Change the settings to accommodate required retry settings.
 ; EXAMPLE: 1 | Minimum wait (seconds) | RECOMMENDED
 min_interval = 1
 ; EXAMPLE: 60 | Maximum wait (seconds) | RECOMMENDED
-max_interval = 30
+max_interval = 60
 ; EXAMPLE: 1 | Initial retry delay (seconds) | RECOMMENDED
 initial_retry_interval = 1
 ; EXAMPLE: 1.5 | Backoff multiplier | | RECOMMENDED
@@ -184,7 +184,16 @@ log_level = INFO
     
 2.  Download private key as  `oci_private_key.pem`
     
-3.  Copy the contents from the Text Box and save it to file `config`.
+3.  Create a `config` file in the repo root with the standard OCI SDK format (required fields shown below):
+    
+```ini
+[DEFAULT]
+user=ocid1.user.oc1..exampleuniqueID
+fingerprint=aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99
+tenancy=ocid1.tenancy.oc1..exampleuniqueID
+region=us-ashburn-1
+key_file=/absolute/path/to/oci_private_key.pem
+```
     
 
 # Usage

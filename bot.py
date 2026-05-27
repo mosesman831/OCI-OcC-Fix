@@ -252,9 +252,11 @@ class OciOccFix:
             response = self.clients['compute'].launch_instance(launch_details)
             return response.data.id
         except oci.exceptions.ServiceError as e:
+            error_code = getattr(e, 'code', 'Unknown')
             logging.warning(
-                f"Create failed in {availability_domain}: {e.code} - {e.message}"
+                f"Create failed in {availability_domain}: {error_code} - {e.message}"
             )
+            self.adaptive_retry_wait(error_code)
             return None
         except Exception as e:
             logging.error(f"Unexpected creation error: {str(e)}")
