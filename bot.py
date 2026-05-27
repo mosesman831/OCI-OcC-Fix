@@ -1,6 +1,6 @@
 """
 OCI Out of Capacity Fix
-Version 2.1.3
+Version v2.2.0
 Moses (@mosesman831)
 GitHub: https://github.com/mosesman831/OCI-OcC-Fix
 """
