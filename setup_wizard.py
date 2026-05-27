@@ -259,17 +259,17 @@ class SetupWizard:
 
         defaults = self.oci_parser["DEFAULT"] if self.oci_parser.has_section("DEFAULT") else {}
         user = self._ask_text(
-            "User OCID",
+            "User OCID (Identity > Users > your user > OCID)",
             _normalize_default(defaults.get("user")),
             required=True,
         )
         fingerprint = self._ask_text(
-            "API key fingerprint",
+            "API key fingerprint (from your API key in User > API Keys)",
             _normalize_default(defaults.get("fingerprint")),
             required=True,
         )
         tenancy = self._ask_text(
-            "Tenancy OCID",
+            "Tenancy OCID (Administration > Tenancy Details)",
             _normalize_default(defaults.get("tenancy")),
             required=True,
         )
@@ -308,21 +308,21 @@ class SetupWizard:
         use_boot = self._ask_yes_no("Do you want to use an existing boot volume?")
         if use_boot:
             boot_volume_id = self._ask_text(
-                "Boot volume OCID (boot_volume_id)",
+                "Boot volume OCID (sourceDetails.bootVolumeId or Storage > Boot Volumes)",
                 _normalize_default(defaults.get("boot_volume_id")),
                 required=True,
             )
-            image_id = "xxxx"
+            image_id = _normalize_default(defaults.get("image_id"))
         else:
             image_id = self._ask_text(
-                "Image OCID (image_id)",
+                "Image OCID (sourceDetails.imageId or Instance > Image OCID)",
                 _normalize_default(defaults.get("image_id")),
                 required=True,
             )
             boot_volume_id = "xxxx"
 
         availability_domains_raw = self._ask_text(
-            "Availability Domains (comma-separated or JSON array)",
+            "Availability Domains (comma-separated or JSON array; Identity > Availability Domains)",
             _normalize_default(defaults.get("availability_domains")),
             required=True,
             validator=self._validate_availability_domains,
@@ -332,25 +332,26 @@ class SetupWizard:
             self._abort(availability_domains)
 
         compartment_id = self._ask_text(
-            "Compartment OCID (compartment_id)",
+            "Compartment OCID (request body: compartmentId)",
             _normalize_default(defaults.get("compartment_id")),
             required=True,
         )
         subnet_id = self._ask_text(
-            "Subnet OCID (subnet_id)",
+            "Subnet OCID (request body: subnetId or VCN > Subnets)",
             _normalize_default(defaults.get("subnet_id")),
             required=True,
         )
 
-        self.oci_config_updates = {
-            "OCI": {
-                "image_id": image_id,
-                "availability_domains": availability_domains,
-                "compartment_id": compartment_id,
-                "subnet_id": subnet_id,
-                "boot_volume_id": boot_volume_id,
-            }
+        oci_updates = {
+            "availability_domains": availability_domains,
+            "compartment_id": compartment_id,
+            "subnet_id": subnet_id,
+            "boot_volume_id": boot_volume_id,
         }
+        if image_id:
+            oci_updates["image_id"] = image_id
+
+        self.oci_config_updates = {"OCI": oci_updates}
 
     def _step_instance_config(self) -> None:
         self._show_info(
@@ -362,12 +363,12 @@ class SetupWizard:
         defaults = self.config_parser["Instance"] if self.config_parser.has_section("Instance") else {}
 
         display_name = self._ask_text(
-            "Instance display name (display_name)",
+            "Instance display name (any unique name)",
             _normalize_default(defaults.get("display_name")),
             required=True,
         )
         ssh_keys = self._ask_text(
-            "Public SSH key (ssh_keys)",
+            "Public SSH key (from ~/.ssh/id_rsa.pub or Instance > SSH Keys)",
             _normalize_default(defaults.get("ssh_keys")),
             required=True,
         )
@@ -546,6 +547,11 @@ def main() -> None:
 
     config_path = Path(args.config).expanduser().resolve()
     oci_config_path = Path(args.oci_config).expanduser().resolve()
+
+    if not config_path.exists():
+        print(f"Configuration file not found: {config_path}")
+        print("Run the wizard from the repo root or pass --config path.")
+        sys.exit(1)
 
     wizard = SetupWizard(config_path, oci_config_path, use_gui=args.gui)
     wizard.run()
