@@ -74,6 +74,10 @@ If you want a guided, step-by-step setup (recommended), run:
 python3 setup_wizard.py
 ```
 
+> [!IMPORTANT]
+> Run the wizard from the repository root so it can read/write `configuration.ini` and `config` in the locations that `bot.py` expects.
+> If you run it from another directory, pass the file paths explicitly with `--config` and `--oci-config`.
+
 Optional: use simple graphical dialogs (requires tkinter):
 
 ```bash
