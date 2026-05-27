@@ -192,7 +192,7 @@ user=ocid1.user.oc1..exampleuniqueID
 fingerprint=aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99
 tenancy=ocid1.tenancy.oc1..exampleuniqueID
 region=us-ashburn-1
-key_file=/absolute/path/to/oci_private_key.pem
+key_file=/path/to/oci_private_key.pem
 ```
     
 

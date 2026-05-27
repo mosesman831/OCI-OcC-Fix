@@ -256,7 +256,8 @@ class OciOccFix:
             logging.warning(
                 f"Create failed in {availability_domain}: {error_code} - {e.message}"
             )
-            self.adaptive_retry_wait(error_code)
+            if error_code in {"TooManyRequests", "OutOfHostCapacity", "OutOfCapacity"}:
+                self.adaptive_retry_wait(error_code)
             return None
         except Exception as e:
             logging.error(f"Unexpected creation error: {str(e)}")
