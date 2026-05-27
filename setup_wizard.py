@@ -257,7 +257,7 @@ class SetupWizard:
             "the private key file path.",
         )
 
-        defaults = self.oci_parser["DEFAULT"] if self.oci_parser.has_section("DEFAULT") else {}
+        defaults = self.oci_parser["DEFAULT"]
         user = self._ask_text(
             "User OCID (Identity > Users > your user > OCID)",
             _normalize_default(defaults.get("user")),
