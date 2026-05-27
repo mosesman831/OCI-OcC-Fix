@@ -372,11 +372,14 @@ class SetupWizard:
             _normalize_default(defaults.get("ssh_keys")),
             required=True,
         )
+        boot_volume_default = _normalize_default(defaults.get("boot_volume_size"))
+        if boot_volume_default in {None, "0"}:
+            boot_volume_default = "47"
         boot_volume_size = self._ask_text(
-            "Boot volume size in GB (47-200, use 0 for default)",
-            _normalize_default(defaults.get("boot_volume_size")) or "0",
+            "Boot volume size in GB (47-200, default: 47)",
+            boot_volume_default,
             required=True,
-            validator=self._validate_int,
+            validator=self._validate_boot_volume_size,
         )
 
         self.instance_updates = {
@@ -482,6 +485,16 @@ class SetupWizard:
             return False, "Enter a number."
         if not value.isdigit():
             return False, "Enter a valid integer."
+        return True, ""
+
+    @staticmethod
+    def _validate_boot_volume_size(value: str) -> Tuple[bool, str]:
+        ok, message = SetupWizard._validate_int(value)
+        if not ok:
+            return ok, message
+        size = int(value)
+        if size < 47 or size > 200:
+            return False, "Boot volume size must be between 47 and 200 GB."
         return True, ""
 
     @staticmethod
