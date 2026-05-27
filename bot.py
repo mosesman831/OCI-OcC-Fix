@@ -252,9 +252,10 @@ class OciOccFix:
             response = self.clients['compute'].launch_instance(launch_details)
             return response.data.id
         except oci.exceptions.ServiceError as e:
-            error_code = getattr(e, 'code', 'Unknown')
+            error_code = getattr(e, 'code', None)
+            log_code = error_code or 'UnknownServiceError'
             logging.warning(
-                f"Create failed in {availability_domain}: {error_code} - {e.message}"
+                f"Create failed in {availability_domain}: {log_code} - {e.message}"
             )
             if error_code in {"TooManyRequests", "OutOfHostCapacity", "OutOfCapacity"}:
                 self.adaptive_retry_wait(error_code)
