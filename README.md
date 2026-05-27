@@ -27,6 +27,7 @@ Automated solution for Oracle Cloud Infrastructure (OCI) Out of Capacity errors 
 ## Table of Contents
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Setup Wizard](#setup-wizard)
 - [Usage](#usage)
 - [Docker Setup](#docker-setup)
 
@@ -64,6 +65,24 @@ rm main.zip && cd OCI-OcC-Fix
 pip install -r requirements.txt
 ```
 # Configuration
+
+## Setup Wizard
+
+If you want a guided, step-by-step setup (recommended), run:
+
+```bash
+python3 setup_wizard.py
+```
+
+Optional: use simple graphical dialogs (requires tkinter):
+
+```bash
+python3 setup_wizard.py --gui
+```
+
+The wizard walks you through each field and updates:
+- `configuration.ini`
+- `config` (OCI SDK config file)
 
 ## File Setup
 
