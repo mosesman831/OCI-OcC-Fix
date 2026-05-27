@@ -1,10 +1,11 @@
 """
 OCI Out of Capacity Fix
-Version 2.1.3
+Version v2.2.0
 Moses (@mosesman831)
 GitHub: https://github.com/mosesman831/OCI-OcC-Fix
 """
 
+import argparse
 import oci
 import logging
 import time
@@ -19,15 +20,18 @@ from typing import Dict, Optional, List
 
 # Constants
 CONFIG_FILE = 'configuration.ini'
+OCI_CONFIG_FILE = 'config'
 LOG_FILE = 'oci_occ.log'
 MAX_LOG_SIZE = 5 * 1024 * 1024  # 5 MB
 LOG_BACKUP_COUNT = 3
 RETRYABLE_ERROR_CODES = {"TooManyRequests", "OutOfHostCapacity", "OutOfCapacity"}
 
 class OciOccFix:
-    def __init__(self):
+    def __init__(self, config_path: Path, oci_config_path: Path):
+        self.config_path = config_path
+        self.oci_config_path = oci_config_path
         # Phase 1: Core configuration
-        self.config = self.load_config()
+        self.config = self.load_config(self.config_path)
         self.setup_logging()
         
         # Phase 2: Initialize critical parameters first
@@ -49,13 +53,13 @@ class OciOccFix:
         self.retry_counter = 0
 
     @staticmethod
-    def load_config() -> configparser.ConfigParser:
+    def load_config(config_path: Path) -> configparser.ConfigParser:
         """Load and validate configuration with strict checks"""
         config = configparser.ConfigParser()
-        if not Path(CONFIG_FILE).exists():
-            raise FileNotFoundError(f"Configuration file {CONFIG_FILE} not found")
+        if not config_path.exists():
+            raise FileNotFoundError(f"Configuration file {config_path} not found")
         
-        config.read(CONFIG_FILE)
+        config.read(config_path)
         
         # Validate required sections
         required_sections = ['OCI', 'Instance', 'Telegram', 'Machine', 'Retry']
@@ -104,7 +108,7 @@ class OciOccFix:
     def initialize_oci_clients(self) -> Dict[str, object]:
         """Initialize OCI clients with error containment"""
         try:
-            self.oci_config = oci.config.from_file('./config')
+            self.oci_config = oci.config.from_file(str(self.oci_config_path))
             return {
                 'compute': oci.core.ComputeClient(self.oci_config),
                 'identity': oci.identity.IdentityClient(self.oci_config),
@@ -386,9 +390,29 @@ class OciOccFix:
                 self.adaptive_retry_wait(error_code)
                 time.sleep(self.wait_seconds)
 
-if __name__ == "__main__":
+def main() -> None:
+    parser = argparse.ArgumentParser(description="OCI-OcC-Fix runner")
+    parser.add_argument(
+        "--config",
+        default=CONFIG_FILE,
+        help="Path to configuration.ini",
+    )
+    parser.add_argument(
+        "--oci-config",
+        default=OCI_CONFIG_FILE,
+        help="Path to OCI SDK config file (default: ./config)",
+    )
+    args = parser.parse_args()
+
+    config_path = Path(args.config).expanduser().resolve()
+    oci_config_path = Path(args.oci_config).expanduser().resolve()
+
     try:
-        OciOccFix().run()
+        OciOccFix(config_path=config_path, oci_config_path=oci_config_path).run()
     except Exception as e:
         logging.critical(f"💀 Fatal initialization error: {str(e)}")
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
