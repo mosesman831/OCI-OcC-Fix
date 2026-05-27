@@ -22,6 +22,7 @@ CONFIG_FILE = 'configuration.ini'
 LOG_FILE = 'oci_occ.log'
 MAX_LOG_SIZE = 5 * 1024 * 1024  # 5 MB
 LOG_BACKUP_COUNT = 3
+RETRYABLE_ERROR_CODES = {"TooManyRequests", "OutOfHostCapacity", "OutOfCapacity"}
 
 class OciOccFix:
     def __init__(self):
@@ -252,12 +253,12 @@ class OciOccFix:
             response = self.clients['compute'].launch_instance(launch_details)
             return response.data.id
         except oci.exceptions.ServiceError as e:
-            error_code = getattr(e, 'code', None)
+            error_code = e.code
             log_code = error_code or 'UnknownServiceError'
             logging.warning(
                 f"Create failed in {availability_domain}: {log_code} - {e.message}"
             )
-            if error_code in {"TooManyRequests", "OutOfHostCapacity", "OutOfCapacity"}:
+            if error_code in RETRYABLE_ERROR_CODES:
                 self.adaptive_retry_wait(error_code)
             return None
         except Exception as e:
