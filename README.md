@@ -184,7 +184,7 @@ log_level = INFO
     
 2.  Download private key as  `oci_private_key.pem`
     
-3.  Create a `config` file in the repo root with the standard OCI SDK format (use the private key from step 2 for `key_file` and replace the example path with your actual key location):
+3.  Create a `config` file in the repo root with the standard OCI SDK format (replace `user`, `fingerprint`, `tenancy`, `region`, and `key_file` with your actual OCI values; use the private key from step 2 for `key_file`):
     
 ```ini
 [DEFAULT]
