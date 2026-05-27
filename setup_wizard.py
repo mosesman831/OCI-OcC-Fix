@@ -279,11 +279,22 @@ class SetupWizard:
             _normalize_default(defaults.get("region")),
             required=True,
         )
-        key_file = self._ask_file(
-            "Private key file path (PEM)",
-            _normalize_default(defaults.get("key_file")),
-        )
-        key_file = str(Path(key_file).expanduser())
+        key_file_default = _normalize_default(defaults.get("key_file"))
+        while True:
+            key_file = self._ask_file(
+                "Private key file path (PEM)",
+                key_file_default,
+            )
+            key_path = Path(key_file).expanduser()
+            if key_path.exists() and key_path.is_file() and os.access(key_path, os.R_OK):
+                key_file = str(key_path)
+                break
+            self._show_error(
+                "Invalid private key file",
+                f"The private key file '{key_path}' does not exist, is not a file, "
+                "or is not readable. Please choose a readable PEM file.",
+            )
+            key_file_default = str(key_path)
 
         self.oci_updates = {
             "DEFAULT": {
