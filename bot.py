@@ -254,9 +254,9 @@ class OciOccFix:
             return response.data.id
         except oci.exceptions.ServiceError as e:
             error_code = e.code
-            log_code = error_code or 'UnknownServiceError'
+            display_code = error_code or 'UnknownServiceError'
             logging.warning(
-                f"Create failed in {availability_domain}: {log_code} - {e.message}"
+                f"Create failed in {availability_domain}: {display_code} - {e.message}"
             )
             if error_code in RETRYABLE_ERROR_CODES:
                 self.adaptive_retry_wait(error_code)
