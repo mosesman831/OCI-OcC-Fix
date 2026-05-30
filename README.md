@@ -7,6 +7,8 @@ Automated solution for Oracle Cloud Infrastructure (OCI) Out of Capacity errors 
 [![GitHub release](https://img.shields.io/github/release/mosesman831/OCI-OcC-Fix?color=blueviolet&style=flat-square)](https://github.com/mosesman831/OCI-OcC-Fix/releases/)
 ![GitHub License](https://img.shields.io/github/license/mosesman831/OCI-OcC-Fix)
 [![GitHub Clones](https://img.shields.io/badge/dynamic/json?color=success&label=Clone&query=count&url=https://gist.githubusercontent.com/mosesman831/7fe542add926a52bbdcee8e98f7bd81b/raw/clone.json&logo=github)](https://github.com/MShawon/github-clone-count-badge)
+[![GitHub Traffic](https://img.shields.io/badge/dynamic/json?color=success&label=Views&query=count&url=https://gist.githubusercontent.com/mosesman831/0baf70efa8613a220ad3633d7abb62cd/raw/traffic.json&logo=github)](https://github.com/MShawon/github-clone-count-badge)
+
 
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R1VPIGM)
