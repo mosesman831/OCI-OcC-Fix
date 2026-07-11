@@ -118,9 +118,13 @@ class Metrics:
         self._gauges: dict[tuple[str, tuple[tuple[str, str], ...]], float] = {}
         self._histograms: dict[tuple[str, tuple[tuple[str, str], ...]], list[float]] = {}
         self._prom: dict[str, object] = {}
+        self._registry = None
         try:
-            import prometheus_client  # noqa: F401
+            import prometheus_client
 
+            # Each Metrics instance gets its own registry so multiple instances
+            # (e.g. across tests or subsystems) never collide in the global one.
+            self._registry = prometheus_client.CollectorRegistry()
             self._prometheus = True
         except Exception:  # noqa: BLE001
             self._prometheus = False
@@ -189,7 +193,7 @@ class Metrics:
                 "gauge": prometheus_client.Gauge,
                 "histogram": prometheus_client.Histogram,
             }[kind]
-            metric = factory(name, name, labelnames=label_names)
+            metric = factory(name, name, labelnames=label_names, registry=self._registry)
             self._prom[cache_key] = metric
         if label_names:
             return metric.labels(**{k: str(labels[k]) for k in label_names})  # type: ignore[attr-defined]
@@ -202,7 +206,7 @@ class Metrics:
             return False
         import prometheus_client
 
-        prometheus_client.start_http_server(port)
+        prometheus_client.start_http_server(port, registry=self._registry)  # type: ignore[arg-type]
         return True
 
 
