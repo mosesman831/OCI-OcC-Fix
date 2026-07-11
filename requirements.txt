@@ -3,3 +3,9 @@ oci
 pyTelegramBotAPI
 configparser
 python-dotenv
+
+# Optional dependency groups are declared in pyproject.toml [project.optional-dependencies]:
+#   metrics = [prometheus_client]
+#   http    = [fastapi, uvicorn]
+#   dev     = [pytest, pytest-cov, ruff, mypy]
+# Install e.g. with: pip install -e .[dev,metrics]

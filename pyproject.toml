@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oci-occ-fix"
+version = "3.0.0.dev0"
+description = "Automated Oracle Cloud Infrastructure Out-of-Capacity (OCC) fixer and Telegram bot."
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "oci",
+    "pyTelegramBotAPI",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+metrics = ["prometheus_client"]
+http = ["fastapi", "uvicorn"]
+dev = ["pytest", "pytest-cov", "ruff", "mypy"]
+
+[project.scripts]
+oci-occ-fix = "occfix.cli:main"
+
+[tool.setuptools]
+py-modules = ["bot", "setup_wizard"]
+
+[tool.setuptools.packages.find]
+include = ["occfix*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# setup_wizard.py is legacy/untyped and intentionally not linted here.
+extend-exclude = ["setup_wizard.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = false
+check_untyped_defs = true
+files = ["occfix"]
+exclude = "(^|/)(bot|setup_wizard)\\.py$"
+
+# The legacy top-level scripts are untyped; don't follow imports into them.
+[[tool.mypy.overrides]]
+module = ["bot", "setup_wizard"]
+follow_imports = "skip"
+ignore_errors = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
