@@ -10,9 +10,9 @@ from __future__ import annotations
 import configparser
 import json
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping, Optional
 
 from occfix.models import ConfigError, LaunchSpec
 
@@ -29,7 +29,7 @@ class RetryConfig:
 
 @dataclass
 class RateLimitConfig:
-    mode: str = "adaptive"          # "fixed" | "adaptive"
+    mode: str = "adaptive"  # "fixed" | "adaptive"
     max_calls_per_sec: float = 2.0
     min_calls_per_sec: float = 0.2
     concurrency: int = 3
@@ -45,14 +45,14 @@ class LimitsConfig:
 
 @dataclass
 class StateConfig:
-    backend: str = "sqlite"         # "sqlite" | "json" | "none"
+    backend: str = "sqlite"  # "sqlite" | "json" | "none"
     path: str = "occfix_state.db"
 
 
 @dataclass
 class ObservabilityConfig:
     log_level: str = "INFO"
-    log_format: str = "human"       # "human" | "json"
+    log_format: str = "human"  # "human" | "json"
     log_file: str = "oci_occ.log"
     metrics_enabled: bool = False
     metrics_port: int = 9090
@@ -79,14 +79,14 @@ class ControlConfig:
 
 @dataclass
 class ScheduleConfig:
-    quiet_hours: str = ""           # e.g. "01:00-06:00"
-    max_runtime: str = ""           # e.g. "12h"
-    max_attempts: int = 0           # 0 = unlimited
+    quiet_hours: str = ""  # e.g. "01:00-06:00"
+    max_runtime: str = ""  # e.g. "12h"
+    max_attempts: int = 0  # 0 = unlimited
 
 
 @dataclass
 class AuthConfig:
-    method: str = "key_file"        # key_file|env|instance_principal|resource_principal|session_token
+    method: str = "key_file"  # key_file|env|instance_principal|resource_principal|session_token
     oci_config_path: str = "config"
     oci_profile: str = "DEFAULT"
 
@@ -145,7 +145,7 @@ def _as_bool(value: str, fallback: bool = False) -> bool:
     return value.strip().lower() in ("1", "true", "yes", "on")
 
 
-def _legacy_target(cp: configparser.ConfigParser, oci_region: str) -> Optional[LaunchSpec]:
+def _legacy_target(cp: configparser.ConfigParser, oci_region: str) -> LaunchSpec | None:
     """Build a single target from legacy [OCI]/[Instance]/[Machine] sections."""
 
     if not cp.has_section("OCI"):
@@ -195,8 +195,8 @@ def load_config(
     ini_path: str | os.PathLike = "configuration.ini",
     oci_config_path: str | os.PathLike = "config",
     *,
-    env: Optional[Mapping[str, str]] = None,
-    overrides: Optional[Mapping[str, object]] = None,
+    env: Mapping[str, str] | None = None,
+    overrides: Mapping[str, object] | None = None,
 ) -> AppConfig:
     """Load and merge configuration from all layers and return an AppConfig."""
 
@@ -290,9 +290,7 @@ def load_config(
         cfg.control.http_enabled = _as_bool(
             _get(cp, "Control", "http_enabled"), cfg.control.http_enabled
         )
-        cfg.control.http_port = cp.getint(
-            "Control", "http_port", fallback=cfg.control.http_port
-        )
+        cfg.control.http_port = cp.getint("Control", "http_port", fallback=cfg.control.http_port)
         cfg.control.telegram_commands = _as_bool(
             _get(cp, "Control", "telegram_commands"), cfg.control.telegram_commands
         )
@@ -353,9 +351,12 @@ def _apply_env(cfg: AppConfig, env: Mapping[str, str]) -> None:
         if env_key in env and env[env_key] != "":
             setattr(getattr(cfg, group), field_name, _coerce(env[env_key], typ))
     # Telegram creds via env enable the channel too.
-    if cfg.notify.telegram_bot_token and cfg.notify.telegram_bot_token != "xxxx" and (
-        cfg.notify.telegram_uid and cfg.notify.telegram_uid != "xxxx"
-    ) and "telegram" not in cfg.notify.channels:
+    if (
+        cfg.notify.telegram_bot_token
+        and cfg.notify.telegram_bot_token != "xxxx"
+        and (cfg.notify.telegram_uid and cfg.notify.telegram_uid != "xxxx")
+        and "telegram" not in cfg.notify.channels
+    ):
         cfg.notify.channels.append("telegram")
 
 

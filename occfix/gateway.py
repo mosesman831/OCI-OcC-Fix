@@ -9,7 +9,7 @@ tests.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Callable, Optional, Sequence, Union
+from collections.abc import Callable, Sequence
 
 from occfix.models import (
     AuthError,
@@ -32,9 +32,7 @@ class OciGateway(ABC):
         """List block volumes in a compartment."""
 
     @abstractmethod
-    def list_boot_volumes(
-        self, compartment_id: str, availability_domain: str
-    ) -> list[VolumeInfo]:
+    def list_boot_volumes(self, compartment_id: str, availability_domain: str) -> list[VolumeInfo]:
         """List boot volumes in a compartment + AD."""
 
     @abstractmethod
@@ -42,9 +40,7 @@ class OciGateway(ABC):
         """List compute instances in a compartment."""
 
     @abstractmethod
-    def launch_instance(
-        self, spec: LaunchSpec, availability_domain: str, retry_token: str
-    ) -> str:
+    def launch_instance(self, spec: LaunchSpec, availability_domain: str, retry_token: str) -> str:
         """Attempt to launch an instance; return its OCID on success.
 
         Must raise a :class:`~occfix.models.LaunchError` subclass on failure so
@@ -52,7 +48,7 @@ class OciGateway(ABC):
         """
 
     @abstractmethod
-    def get_public_ip(self, compartment_id: str, instance_id: str) -> Optional[str]:
+    def get_public_ip(self, compartment_id: str, instance_id: str) -> str | None:
         """Return the public IP for a launched instance, if any."""
 
     @abstractmethod
@@ -62,7 +58,7 @@ class OciGateway(ABC):
 
 # A scripted launch step for the fake: either an OCID string to return, or a
 # LaunchError to raise, or a callable producing one of those.
-LaunchStep = Union[str, LaunchError, Callable[[LaunchSpec, str], Union[str, LaunchError]]]
+LaunchStep = str | LaunchError | Callable[[LaunchSpec, str], "str | LaunchError"]
 
 
 class FakeOciGateway(OciGateway):
@@ -75,12 +71,12 @@ class FakeOciGateway(OciGateway):
     def __init__(
         self,
         *,
-        availability_domains: Optional[Sequence[str]] = None,
-        volumes: Optional[Sequence[VolumeInfo]] = None,
-        boot_volumes: Optional[Sequence[VolumeInfo]] = None,
-        instances: Optional[Sequence[InstanceInfo]] = None,
-        launch_script: Optional[Sequence[LaunchStep]] = None,
-        default_launch: Optional[LaunchStep] = None,
+        availability_domains: Sequence[str] | None = None,
+        volumes: Sequence[VolumeInfo] | None = None,
+        boot_volumes: Sequence[VolumeInfo] | None = None,
+        instances: Sequence[InstanceInfo] | None = None,
+        launch_script: Sequence[LaunchStep] | None = None,
+        default_launch: LaunchStep | None = None,
         tenancy_name: str = "fake-tenancy",
         public_ip: str = "203.0.113.10",
     ) -> None:
@@ -104,28 +100,24 @@ class FakeOciGateway(OciGateway):
     def list_volumes(self, compartment_id: str) -> list[VolumeInfo]:
         return list(self._volumes)
 
-    def list_boot_volumes(
-        self, compartment_id: str, availability_domain: str
-    ) -> list[VolumeInfo]:
+    def list_boot_volumes(self, compartment_id: str, availability_domain: str) -> list[VolumeInfo]:
         return list(self._boot_volumes)
 
     def list_instances(self, compartment_id: str) -> list[InstanceInfo]:
         return list(self._instances)
 
-    def get_public_ip(self, compartment_id: str, instance_id: str) -> Optional[str]:
+    def get_public_ip(self, compartment_id: str, instance_id: str) -> str | None:
         return self._public_ip
 
     def get_tenancy_name(self, tenancy_id: str) -> str:
         return self._tenancy_name
 
     # -- launch ----------------------------------------------------------
-    def launch_instance(
-        self, spec: LaunchSpec, availability_domain: str, retry_token: str
-    ) -> str:
+    def launch_instance(self, spec: LaunchSpec, availability_domain: str, retry_token: str) -> str:
         self.launch_calls.append((availability_domain, retry_token))
         self.retry_tokens.append(retry_token)
 
-        step: Optional[LaunchStep]
+        step: LaunchStep | None
         if self._script:
             step = self._script.pop(0)
         else:
@@ -133,9 +125,7 @@ class FakeOciGateway(OciGateway):
 
         return self._resolve(step, spec, availability_domain)
 
-    def _resolve(
-        self, step: Optional[LaunchStep], spec: LaunchSpec, ad: str
-    ) -> str:
+    def _resolve(self, step: LaunchStep | None, spec: LaunchSpec, ad: str) -> str:
         if step is None:
             raise AuthError("no launch step configured", code="FakeNoStep")
         if callable(step):

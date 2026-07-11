@@ -8,18 +8,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 
 class AttemptResult(str, Enum):
     """Outcome classification for a single launch attempt."""
 
     SUCCESS = "success"
-    CAPACITY = "capacity"       # OutOfHostCapacity / OutOfCapacity -> retry fast (jittered)
-    THROTTLED = "throttled"     # TooManyRequests / 429 -> exponential backoff
-    AUTH_ERROR = "auth_error"   # 401/403/invalid config -> fail fast, do not hammer
-    TRANSIENT = "transient"     # network/5xx/unknown -> capped exponential backoff
-    FATAL = "fatal"             # unrecoverable (e.g. duplicate name, quota) -> stop target
+    CAPACITY = "capacity"  # OutOfHostCapacity / OutOfCapacity -> retry fast (jittered)
+    THROTTLED = "throttled"  # TooManyRequests / 429 -> exponential backoff
+    AUTH_ERROR = "auth_error"  # 401/403/invalid config -> fail fast, do not hammer
+    TRANSIENT = "transient"  # network/5xx/unknown -> capped exponential backoff
+    FATAL = "fatal"  # unrecoverable (e.g. duplicate name, quota) -> stop target
 
 
 # Error codes returned by OCI that are safe/expected to retry against.
@@ -52,9 +51,9 @@ class LaunchError(OccfixError):
         self,
         message: str = "",
         *,
-        code: Optional[str] = None,
-        retry_after: Optional[float] = None,
-        status: Optional[int] = None,
+        code: str | None = None,
+        retry_after: float | None = None,
+        status: int | None = None,
     ) -> None:
         super().__init__(message)
         self.message = message
@@ -99,9 +98,7 @@ class FatalLaunchError(LaunchError):
     result = AttemptResult.FATAL
 
 
-def classify_oci_code(
-    code: Optional[str], status: Optional[int]
-) -> AttemptResult:
+def classify_oci_code(code: str | None, status: int | None) -> AttemptResult:
     """Map an OCI error code / HTTP status to an :class:`AttemptResult`."""
 
     if code in CAPACITY_ERROR_CODES:
@@ -121,9 +118,9 @@ def classify_oci_code(
 def error_for(
     message: str,
     *,
-    code: Optional[str] = None,
-    status: Optional[int] = None,
-    retry_after: Optional[float] = None,
+    code: str | None = None,
+    status: int | None = None,
+    retry_after: float | None = None,
 ) -> LaunchError:
     """Build the appropriate :class:`LaunchError` subclass from OCI context."""
 
@@ -179,8 +176,8 @@ class LaunchSpec:
     subnet_id: str
     display_name: str
     ssh_keys: str = ""
-    image_id: Optional[str] = None
-    boot_volume_id: Optional[str] = None
+    image_id: str | None = None
+    boot_volume_id: str | None = None
     boot_volume_size: int = 47
     machine_type: str = "ARM"
     count: int = 1
@@ -196,11 +193,11 @@ class AttemptOutcome:
     result: AttemptResult
     ad: str
     spec_name: str = ""
-    instance_id: Optional[str] = None
-    code: Optional[str] = None
+    instance_id: str | None = None
+    code: str | None = None
     message: str = ""
-    retry_after: Optional[float] = None
-    latency: Optional[float] = None
+    retry_after: float | None = None
+    latency: float | None = None
 
     @property
     def is_success(self) -> bool:
@@ -214,6 +211,6 @@ class LaunchResult:
     spec_name: str
     instance_id: str
     availability_domain: str
-    public_ip: Optional[str] = None
+    public_ip: str | None = None
     total_attempts: int = 0
     metadata: dict = field(default_factory=dict)
